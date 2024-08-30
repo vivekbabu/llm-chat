@@ -1,6 +1,6 @@
 import streamlit as st
 from streamlit_chat import message
-from utils_llm import chat_api
+from large_language_model_utilities import chat_api
 
 
 MAX_LENGTH_MODEL_DICT = {

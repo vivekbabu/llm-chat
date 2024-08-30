@@ -3,7 +3,7 @@ import streamlit as st
 
 from streamlit_chat import message
 from bot_init import get_text, sidebar
-from utils_llm import interact_with_data_api
+from large_language_model_utilities import interact_with_data_api
 
 
 def chat_with_data():

@@ -109,11 +109,9 @@ def interact_with_data_api(df, model="gpt-4o", temperature=0.0, max_tokens=4096,
         with st.chat_message('assistant'):
             if code is None:
                 st.warning(
-                    "Couldn't find data to plot in the chat. "
-                    "Check if the number of tokens is too low for the data at hand. "
-                    "I.e. if the generated code is cut off, this might be the case.",
-                    icon="🚨"
-                )
+                    "No data found to plot. Please verify if the token count is sufficient for the given data. "
+                    "If the code appears incomplete, this could be the issue.",
+                    icon="⚠️")
                 return "Couldn't plot the data"
             else:
                 code = code.replace("fig.show()", "")
@@ -122,7 +120,7 @@ def interact_with_data_api(df, model="gpt-4o", temperature=0.0, max_tokens=4096,
                 exec(code)
                 return "Complete."
     else:
-        llm = ChatOpenAI(
+        large_lanuguage_model = ChatOpenAI(
             model=model,
             temperature=temperature,
             max_tokens=max_tokens,
@@ -130,7 +128,7 @@ def interact_with_data_api(df, model="gpt-4o", temperature=0.0, max_tokens=4096,
         )
 
         pandas_df_agent = create_pandas_dataframe_agent(
-            llm,
+            large_lanuguage_model,
             df,
             verbose=True,
             return_intermediate_steps=True,
@@ -138,22 +136,21 @@ def interact_with_data_api(df, model="gpt-4o", temperature=0.0, max_tokens=4096,
             handle_parsing_errors=False,
             allow_dangerous_code=True,
         )
-
         print(st.session_state.messages)
         try:
-            stCBHandler = StreamlitCallbackHandler(st.container(), expand_new_thoughts=False)
+            callback_handler = StreamlitCallbackHandler(st.container(), expand_new_thoughts=False)
             with st.chat_message('assistant'):
-                answer = pandas_df_agent(st.session_state.messages, callbacks=[stCBHandler])
-                if answer["intermediate_steps"]:
-                    action = answer["intermediate_steps"][-1][0].tool_input["query"]
-                    with st.status("Executed the code."):
-                        st.write(f"```{action}```")
-                st.write(answer['output'])
-                return answer["output"]
+                pandas_df_agent_response = pandas_df_agent(st.session_state.messages, callbacks=[callback_handler])
+                if pandas_df_agent_response["intermediate_steps"]:
+                    last_action = pandas_df_agent_response["intermediate_steps"][-1][0].tool_input["query"]
+                    with st.status("Code executed successfully."):
+                        st.write(f"```{last_action}```")
+                st.write(pandas_df_agent_response['output'])
+                return pandas_df_agent_response["output"]
         except OutputParserException:
-            error_msg = """OutputParserException error occured in LangChain agent.
-                Refine your query."""
-            return error_msg
+            error_message = """An OutputParserException occurred in the LangChain agent.
+            Please refine your query."""
+            return error_message
         except:
-            error_msg = "Unknown error occured in LangChain agent. Refine your query"
-            return error_msg
+            error_message = "An unknown error occurred in the LangChain agent. Please refine your query."
+            return error_message
