@@ -58,7 +58,7 @@ def chat_api(
     )
 
     if plot_flag:
-        code = extract_python_code(
+        code = get_python(
             response["choices"][0]["message"]["content"])
         if code is None:
             st.warning(
@@ -74,7 +74,7 @@ def chat_api(
     return response["choices"][0]["message"]
 
 
-def extract_python_code(text):
+def get_python(text):
     pattern = r'```python\s(.*?)```'
     matches = re.findall(pattern, text, re.DOTALL)
     if not matches:
@@ -105,7 +105,7 @@ def interact_with_data_api(df, model="gpt-4o", temperature=0.0, max_tokens=4096,
             max_tokens=max_tokens,
             top_p=top_p,
         )
-        code = extract_python_code(response.choices[0].message.content)
+        code = get_python(response.choices[0].message.content)
         with st.chat_message('assistant'):
             if code is None:
                 st.warning(
