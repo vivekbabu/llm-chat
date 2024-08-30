@@ -12,10 +12,10 @@ MAX_LENGTH_MODEL_DICT = {
 
 
 def get_text():
-    """Input text by the user"""
+    """Capture user input for data analysis"""
     input_text = st.chat_input(
-        placeholder="What data analysis do you want?",
-        key="input"
+        placeholder="Enter your data analysis request here...",
+        key="user_input"
     )
     return input_text
 
@@ -23,11 +23,11 @@ def get_text():
 def sidebar():
     """App sidebar content"""
 
-    model = st.selectbox(
+    large_language_model = st.selectbox(
         label="Available Models",
         options=["gpt-3.5-turbo", "gpt-4", "gpt-3.5-turbo-16k"],
-        help="""The available models. Same prompt might return different results for
-        different models. Epxerimentation is recommended."""
+        help="""Choose a model to use. Note that the same prompt may yield different results
+        across models. Experimentation is encouraged."""
     )
 
     temperature = st.slider(
@@ -37,24 +37,21 @@ def sidebar():
         max_value=2.,
         step=0.01,
         help=(
-            """Controls randomness. What sampling temperature to use, between 0 and 2.
-            Higher values like 0.8 will make the output more random, while lower values
-            like 0.2 will make it more focused and deterministic.
-            It is recommended to alter this or `top_n` but not both"""
+            """Adjusts the randomness of the output. A value between 0 and 2, where higher values
+            (e.g., 0.8) make the output more varied, while lower values (e.g., 0.2) make it more
+            focused and predictable. It's advisable to modify either this or `top_p`, but not both."""
         )
     )
-    max_tokens = st.slider(
-        label="Maximum length (tokens)",
+    maximum_tokens = st.slider(
+        label="Maximum Length (Tokens)",
         value=4096,
         min_value=0,
-        max_value=MAX_LENGTH_MODEL_DICT[model],
+        max_value=MAX_LENGTH_MODEL_DICT[large_language_model],
         step=1,
         help=(
-            """The maximum number of tokens to generate in the chat completion.
-            The total length of input tokens and generated tokens is limited by
-            the model's context length."""
+            """Sets the maximum number of tokens for the generated output. Keep in mind that the
+            total number of input and output tokens is constrained by the model's context length."""
         )
-
     )
     top_p = st.slider(
         label="Top P",
@@ -63,20 +60,19 @@ def sidebar():
         max_value=1.0,
         step=0.01,
         help=(
-            """An alternative to sampling with temperature, called nucleus sampling,
-            where the model considers the results of the tokens with top_p probability
-            mass. So 0.1 means only the tokens comprising the top 10% probability
-            mass are considered.
-            It is recommended to alter this or `temperature` but not both"""
+            """Controls the diversity of the output through nucleus sampling. The model will
+            consider tokens within the top `top_p` probability mass. For example, a value of 0.1
+            limits the output to the top 10% most likely tokens. It's recommended to adjust either
+            this or `temperature`, but not both."""
         )
     )
-    out_dict = {
-        "model": model,
+    output_dictionary = {
+        "model": large_language_model,
         "temperature": temperature,
-        "max_tokens": max_tokens,
+        "max_tokens": maximum_tokens,
         "top_p": top_p,
     }
-    return out_dict
+    return output_dictionary
 
 
 def chatbot():

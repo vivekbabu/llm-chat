@@ -2,7 +2,7 @@ import pandas as pd
 import streamlit as st
 
 from streamlit_chat import message
-from bot_init import get_text, sidebar
+from initialize_chat_bot import get_text, sidebar
 from large_language_model_utilities import interact_with_data_api
 
 
