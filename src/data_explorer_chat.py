@@ -34,7 +34,6 @@ def chat_with_data():
     else:
         df = pd.DataFrame([])
 
-    # Storing the chat
     if "generated" not in st.session_state:
         st.session_state["generated"] = ["Please upload your data"]
 
@@ -43,9 +42,7 @@ def chat_with_data():
 
     if ("messages" in st.session_state) and \
             (len(st.session_state["messages"]) > 2 * memory_window):
-        # Keep only the system prompt and the last `memory_window` prompts/answers
         st.session_state["messages"] = (
-            # the first one is always the system prompt
             [st.session_state["messages"][0]]
             + st.session_state["messages"][-(2 * memory_window - 2):]
         )
