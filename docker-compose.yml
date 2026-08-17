@@ -1,0 +1,13 @@
+# Single-service stack by design — see docs/ADR-001-agent-runtime.md for why
+# Postgres/Redis/a self-hosted tracing service were deferred for this scope.
+# The MCP tool server (src/agent/tools_server.py) runs as a stdio subprocess
+# *inside* this container, not as a separate compose service.
+services:
+  app:
+    build: .
+    ports:
+      - "8501:8501"
+    environment:
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+    volumes:
+      - ./data:/app/data
